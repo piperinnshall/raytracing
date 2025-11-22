@@ -1,3 +1,7 @@
+pub mod image;
+
+use image::Color;
+
 fn main() {
-    println!("Hello, world!");
+    println!("\n --- Begin Raytracing ---");
 }
