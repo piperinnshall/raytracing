@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter, Result};
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub};
 
 #[derive(Clone, Copy, Default)]
@@ -7,12 +8,41 @@ pub struct Vec3 {
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 { Vec3 { e: [x, y, z] } }
+
+    pub fn unit_vector(v: Vec3) -> Vec3 { v / v.length() }
+
+    pub fn dot(u: Vec3, v: Vec3) -> f64 {
+        u[0] * v[0] + u[1] * v[1] + u[2] * v[2] 
+    }
+
+    pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
+        Vec3::new(
+            u[1] * v[2] - u[2] * v[1],
+            u[2] * v[0] - u[0] * v[2],
+            u[0] * v[1] - u[1] * v[0],
+        )
+    }
+        
     pub fn x(&self) -> f64 { self[0] }
     pub fn y(&self) -> f64 { self[1] }
     pub fn z(&self) -> f64 { self[2] }
+
+    pub fn length(&self) -> f64 { 
+        self.length_squared().sqrt() 
+    }
+
+    pub fn length_squared(&self) -> f64 { 
+        self[0] * self[0] + self[1] * self[1] + self[2] * self[2] 
+    }
 }
 
 pub type Point3 = Vec3;
+
+impl Display for Vec3 {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "{} {} {}", self.e[0], self.e[1], self.e[2])
+    }
+}
 
 macro_rules! impl_op {
     ($trait:ident, $func:ident, $op:tt) => {
