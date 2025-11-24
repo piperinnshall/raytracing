@@ -1,8 +1,7 @@
-pub mod image;
-pub mod vector;
+pub mod vec3;
 
-use image::Color;
-use vector::Vec3;
+use vec3::Vec3;
+type Color = Vec3;
 
 fn main() {
     let image_width = 256;
@@ -16,14 +15,14 @@ fn main() {
             let r = j as f64 / (image_width - 1) as f64;
             let g = i as f64 / (image_height - 1) as f64;
             let b = 0.0;
-            let color = Color {
-                r: (255.999 * r) as u8,
-                g: (255.999 * g) as u8,
-                b: (255.999 * b) as u8,
-                a: 255,
-            };
+            // let color = Color {
+            //     r: (255.999 * r) as u8,
+            //     g: (255.999 * g) as u8,
+            //     b: (255.999 * b) as u8,
+            //     a: 255,
+            // };
 
-            println!("{} {} {}", color.r, color.g, color.b);
+            // println!("{} {} {}", color.r, color.g, color.b);
         }
     }
 
