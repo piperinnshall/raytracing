@@ -14,7 +14,7 @@ pub fn write_color(out: &mut impl Write, pixel_color: Color) {
     let gbyte = (g * 255.999) as u8;
     let bbyte = (b * 255.999) as u8;
 
-    writeln!(out, "{} {} {}", rbyte,gbyte,bbyte).expect("writing color");
+    writeln!(out, "{} {} {}", rbyte, gbyte, bbyte).expect("writing color");
 }
 
 

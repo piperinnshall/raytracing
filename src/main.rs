@@ -9,7 +9,6 @@ const IMAGE_WIDTH: i32 = 256;
 const IMAGE_HEIGHT: i32 = 256;
 
 fn main() {
-
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
     for i in 0..IMAGE_HEIGHT {

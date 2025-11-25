@@ -9,15 +9,15 @@ pub struct Vec3 {
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 { Vec3 { e: [x, y, z] } }
 
-    pub fn dot(self, v: Self) -> f64 {
-        self[0] * v[0] + self[1] * v[1] + self[2] * v[2]
+    pub fn dot(self, rhs: Self) -> f64 {
+        self[0] * rhs[0] + self[1] * rhs[1] + self[2] * rhs[2]
     }
 
-    pub fn cross(self, v: Self) -> Vec3 {
+    pub fn cross(self, rhs: Self) -> Vec3 {
         Vec3::new(
-            self[1] * v[2] - self[2] * v[1],
-            self[2] * v[0] - self[0] * v[2],
-            self[0] * v[1] - self[1] * v[0],
+            self[1] * rhs[2] - self[2] * rhs[1],
+            self[2] * rhs[0] - self[0] * rhs[2],
+            self[0] * rhs[1] - self[1] * rhs[0],
         )
     }
 
