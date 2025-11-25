@@ -21,7 +21,7 @@ fn main() {
             let g = i as f64 / (IMAGE_HEIGHT - 1) as f64;
             let b = 0.25;
 
-            color::write_color(&mut io::stdout(), Color::new(r,g,b));
+            color::write_color(&mut io::stdout(), Color::new(r,g,b) );
         }
     }
 
