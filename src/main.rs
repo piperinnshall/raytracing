@@ -1,28 +1,27 @@
+pub mod color;
 pub mod vec3;
 
-use vec3::Vec3;
-type Color = Vec3;
+use std::io;
+use color::Color;
+
+const IMAGE_WIDTH: i32 = 256;
+const IMAGE_HEIGHT: i32 = 256;
 
 fn main() {
-    let image_width = 256;
-    let image_height = 256;
 
-    println!("P3\n{} {}\n255", image_width, image_height);
+    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
-    for i in 0..image_height {
-        eprintln!("Scanlines Remaining: {}", (image_height - i));
-        for j in 0..image_width {
-            let r = j as f64 / (image_width - 1) as f64;
-            let g = i as f64 / (image_height - 1) as f64;
-            let b = 0.0;
-            // let color = Color {
-            //     r: (255.999 * r) as u8,
-            //     g: (255.999 * g) as u8,
-            //     b: (255.999 * b) as u8,
-            //     a: 255,
-            // };
+    for i in 0..IMAGE_HEIGHT {
 
-            // println!("{} {} {}", color.r, color.g, color.b);
+        eprintln!("Scanlines Remaining: {}", (IMAGE_HEIGHT - i));
+
+        for j in 0..IMAGE_WIDTH {
+
+            let r = j as f64 / (IMAGE_WIDTH - 1) as f64;
+            let g = i as f64 / (IMAGE_HEIGHT - 1) as f64;
+            let b = 0.25;
+
+            color::write_color(&mut io::stdout(), Color::new(r,g,b));
         }
     }
 
