@@ -12,7 +12,7 @@ impl Vec3 {
     pub fn unit_vector(v: Vec3) -> Vec3 { v / v.length() }
 
     pub fn dot(u: Vec3, v: Vec3) -> f64 {
-        u[0] * v[0] + u[1] * v[1] + u[2] * v[2] 
+        u[0] * v[0] + u[1] * v[1] + u[2] * v[2]
     }
 
     pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
@@ -22,17 +22,14 @@ impl Vec3 {
             u[0] * v[1] - u[1] * v[0],
         )
     }
-        
+
     pub fn x(&self) -> f64 { self[0] }
     pub fn y(&self) -> f64 { self[1] }
     pub fn z(&self) -> f64 { self[2] }
 
-    pub fn length(&self) -> f64 { 
-        self.length_squared().sqrt() 
-    }
-
-    pub fn length_squared(&self) -> f64 { 
-        self[0] * self[0] + self[1] * self[1] + self[2] * self[2] 
+    pub fn length(&self) -> f64 { self.length_squared().sqrt() }
+    pub fn length_squared(&self) -> f64 {
+        self[0] * self[0] + self[1] * self[1] + self[2] * self[2]
     }
 }
 
@@ -40,7 +37,7 @@ pub type Point3 = Vec3;
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} {} {}", self.e[0], self.e[1], self.e[2])
+        write!(f, "{} {} {}", self[0], self[1], self[2])
     }
 }
 
@@ -50,73 +47,70 @@ macro_rules! impl_op {
             type Output = Vec3;
 
             fn $func(self, rhs: Self) -> Self::Output {
-                Self::new(
-                    self[0] $op rhs[0],
-                    self[1] $op rhs[1],
-                    self[2] $op rhs[2],
-                )
+                Self::new(self[0] $op rhs[0], self[1] $op rhs[1], self[2] $op rhs[2])
+            }
+        }
+    };
+    ($trait:ident, $func:ident, $scalar:ty, $body:expr) => {
+        impl $trait<$scalar> for Vec3 {
+            type Output = Vec3;
+
+            fn $func(self, rhs: $scalar) -> Self::Output {
+                $body(self,rhs)
             }
         }
     };
 }
 
-impl_op!(Sub, sub, -); // Vec3 - Vec3
-impl_op!(Add, add, +); // Vec3 + Vec3
-impl_op!(Mul, mul, *); // Vec3 * Vec3
+// Vec3 op Vec3
+impl_op!(Sub, sub, -);
+impl_op!(Add, add, +);
+impl_op!(Mul, mul, *);
+// Vec3 op $scalar
+impl_op!(Mul, mul, f64, |s: Self, r| Vec3::new(s[0] * r, s[1] * r, s[2] * r));
+impl_op!(Div, div, f64, |s: Self, r| s * (1.0 / r));
 
-impl Mul<f64> for Vec3 { // Vec3 * f64
-    type Output = Vec3;
-
-    fn mul(self, rhs: f64) -> Self::Output {
-        Self::new(self[0] * rhs, self[1] * rhs, self[2] * rhs)
-    }
-}
-
-impl Div<f64> for Vec3 { // Vec3 / f64
-    type Output = Vec3;
-
-    fn div(self, rhs: f64) -> Self::Output {
-        self * (1.0 / rhs)
-    }
-}
-                       
-impl AddAssign for Vec3 { // Vec3 += Vec3
+impl AddAssign for Vec3 {
+    // Vec3 += Vec3
     fn add_assign(&mut self, rhs: Self) {
         self[0] += rhs[0];
         self[1] += rhs[1];
         self[2] += rhs[2];
     }
 }
-
-impl MulAssign<f64> for Vec3 { // Vec3 *= f64
+impl MulAssign<f64> for Vec3 {
+    // Vec3 *= f64
     fn mul_assign(&mut self, rhs: f64) {
         self[0] *= rhs;
         self[1] *= rhs;
         self[2] *= rhs;
     }
 }
-
-impl DivAssign<f64> for Vec3 { // Vec3 /= f64
+impl DivAssign<f64> for Vec3 {
+    // Vec3 /= f64
     fn div_assign(&mut self, rhs: f64) {
         *self *= 1.0 / rhs
     }
 }
 
-impl Neg for Vec3 { // -Vec3
+impl Neg for Vec3 {
+    // -Vec3
     type Output = Vec3;
 
     fn neg(self) -> Self::Output {
         return Self::new(-self[0], -self[1], -self[2]);
     }
 }
-impl Index<usize> for Vec3 { // Vec3[i]
+impl Index<usize> for Vec3 {
+    // Vec3[i]
     type Output = f64;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.e[index]
     }
 }
-impl IndexMut<usize> for Vec3 { // Vec3[i] = 0
+impl IndexMut<usize> for Vec3 {
+    // Vec3[i] = 0
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.e[index]
     }
