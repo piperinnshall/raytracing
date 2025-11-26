@@ -3,6 +3,10 @@ use std::io::Write;
 
 pub type Color = Vec3;
 
+pub fn write_header(out: &mut impl Write, image_width: i32, image_height: i32) {
+    writeln!(out, "P3\n{} {}\n255", image_width, image_height).expect("writing header");
+}
+
 pub fn write_color(out: &mut impl Write, pixel_color: Color) {
     let r = pixel_color.x();
     let g = pixel_color.y();
