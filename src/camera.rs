@@ -10,7 +10,7 @@ pub struct Camera {
 impl Camera { 
     pub fn new(viewport_height: f64, image_width: i32, image_height: i32) -> Self { 
         Self { 
-            center: Point3::default(),
+            center: Vec3::default(),
             focal_length: 1.0,
             viewport_width: viewport_height * (image_width as f64 / image_height as f64),
             viewport_height,
@@ -19,7 +19,7 @@ impl Camera {
 
     pub fn upper_left(&self) -> Point3 {
         self.center 
-            - Point3::new(0.0, 0.0, self.focal_length) 
+            - Vec3::new(0.0, 0.0, self.focal_length) 
             - self.u() / 2.0
             - self.v() / 2.0
     }

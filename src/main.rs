@@ -3,6 +3,7 @@ mod color;
 mod ray;
 mod render;
 mod vec3;
+mod shape;
 
 use camera::Camera;
 
