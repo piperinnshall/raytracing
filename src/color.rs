@@ -21,4 +21,6 @@ pub fn write_color(out: &mut impl Write, pixel_color: Color) {
     writeln!(out, "{} {} {}", rbyte, gbyte, bbyte).expect("writing color");
 }
 
-
+pub fn lerp(c1: Color, c2: Color, t: f64) -> Color {
+    c1 * (1.0 - t) + c2 * t
+}

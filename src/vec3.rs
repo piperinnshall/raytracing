@@ -8,6 +8,7 @@ pub struct Vec3 {
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self { Self { e: [x, y, z] } }
+    pub fn fill(n: f64) -> Self { Self { e: [n, n, n]  } }
 
     pub fn dot(self, rhs: Self) -> f64 {
         self[0] * rhs[0] + self[1] * rhs[1] + self[2] * rhs[2]
