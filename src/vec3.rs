@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub};
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy)]
 pub struct Vec3 {
     e: [f64; 3],
 }
@@ -14,7 +14,7 @@ impl Vec3 {
     }
 
     pub fn cross(self, rhs: Self) -> Self {
-        Vec3::new(
+        Self::new(
             self[1] * rhs[2] - self[2] * rhs[1],
             self[2] * rhs[0] - self[0] * rhs[2],
             self[0] * rhs[1] - self[1] * rhs[0],
@@ -28,13 +28,18 @@ impl Vec3 {
     pub fn z(&self) -> f64 { self[2] }
 
     pub fn length(&self) -> f64 { self.length_squared().sqrt() }
-
     pub fn length_squared(&self) -> f64 {
         self[0] * self[0] + self[1] * self[1] + self[2] * self[2]
     }
 }
 
 pub type Point3 = Vec3;
+
+impl Default for Vec3 {
+    fn default() -> Self {
+        Self::new(0.0, 0.0, 0.0)
+    }
+}
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
@@ -99,7 +104,7 @@ impl Neg for Vec3 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        return Self::new(-self[0], -self[1], -self[2]);
+        Self::new(-self[0], -self[1], -self[2])
     }
 }
 impl Index<usize> for Vec3 {
