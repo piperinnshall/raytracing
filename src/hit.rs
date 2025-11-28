@@ -1,7 +1,7 @@
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct HitRecord {
     pub normal: Vec3,
     pub point: Point3,
@@ -23,7 +23,7 @@ pub trait Hittable {
     fn hit(&self, ray: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool;
 }
 
-struct HitList {
+pub struct HitList {
     shapes: Vec<Box<dyn Hittable>>,
 }
 

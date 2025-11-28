@@ -1,7 +1,4 @@
-// Utitility Constants
+// Utility Functions
 
-const PI: f64 = 3.1415926535897932385;
-
-// Utitility Functions
-pub fn deg_to_rad(degrees: f64) { degrees * PI / 180.0 }
+pub fn deg_to_rad(degrees: f64) -> f64 { degrees * std::f64::consts::PI / 180.0 }
 

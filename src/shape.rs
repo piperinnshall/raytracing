@@ -22,7 +22,7 @@ impl Hittable for Sphere {
 
         let discriminant = h * h - a * c;
         if discriminant < 0.0 {
-            return false;
+            return false
         }
 
         let sqrtd = f64::sqrt(discriminant);
@@ -32,7 +32,7 @@ impl Hittable for Sphere {
         if root < ray_tmin || ray_tmax <= root {
             root = (h + sqrtd) / a;
             if root <= ray_tmin || ray_tmax <= root {
-                return false;
+                return false
             }
         }
 
