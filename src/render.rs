@@ -8,17 +8,12 @@ use crate::utils;
 
 use std::io;
 
-pub fn render_image(camera: Camera) {
+pub fn render_image(camera: Camera, image_width: i32, image_height: i32) {
     
-    // Image
-
-    let image_width = camera.image_width();
-    let image_height = camera.image_height();
-
     // World
 
     let mut world = HitList::new();
-    world.add(Sphere::new(Point3::new(0.0, 0.0, 0.1), 0.5));
+    world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
     world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
 
     // Camera 
@@ -37,7 +32,7 @@ pub fn render_image(camera: Camera) {
 
     for col in 0..image_height {
 
-        eprintln!("scan lines remaining: {}", (image_height - col));
+        // eprintln!("scan lines remaining: {}", (image_height - col));
 
         for row in 0..image_width {
 
@@ -59,8 +54,8 @@ pub fn render_image(camera: Camera) {
 
 fn color(ray: Ray, world: &HitList) -> Color {
     let mut rec = HitRecord::default();
-    if world.hit(&ray, 0.0, f64::INFINITY, &mut rec) {
-        return (Color::fill(1.0) * rec.normal) * 0.5
+    if world.hit(&ray, 0.001, f64::INFINITY, &mut rec) {
+        return (Color::fill(1.0) + rec.normal) * 0.5
     }
 
     let unit_direction = ray.direction().normalize();

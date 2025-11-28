@@ -16,5 +16,5 @@ const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
 fn main() {
     assert!(IMAGE_HEIGHT > 1);
     let camera = Camera::new(2.0, IMAGE_WIDTH, IMAGE_HEIGHT);
-    render::render_image(camera);
+    render::render_image(camera, IMAGE_WIDTH, IMAGE_HEIGHT);
 }
