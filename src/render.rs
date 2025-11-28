@@ -15,6 +15,7 @@ pub fn render_image(camera: Camera, image_width: i32, image_height: i32) {
     let mut world = HitList::new();
     world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
     world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
+    world.add(Sphere::new(Point3::new(-1.0, 0.5, -1.0), 0.3));
 
     // Camera 
     
@@ -32,7 +33,7 @@ pub fn render_image(camera: Camera, image_width: i32, image_height: i32) {
 
     for col in 0..image_height {
 
-        // eprintln!("scan lines remaining: {}", (image_height - col));
+        eprintln!("scan lines remaining: {}", (image_height - col));
 
         for row in 0..image_width {
 

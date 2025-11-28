@@ -6,6 +6,7 @@ mod vec3;
 mod shape;
 mod hit;
 mod utils;
+mod interval;
 
 use camera::Camera;
 
