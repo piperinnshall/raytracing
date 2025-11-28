@@ -45,13 +45,14 @@ fn color(ray: Ray) -> Color {
         radius: 0.5,
     };
 
-    if shape::hit(&sphere, &ray) { return Color::new(1.0, 0.0, 0.0); }
+    let hit = shape::hit(&sphere, &ray);
+    if hit > 0.0 {
+        return shape::surface_color(&sphere, &ray, hit);
+    }
 
     let unit_direction = ray.direction().normalize();
     let t = 0.5 * (unit_direction.y() + 1.0);
 
     color::lerp(Color::fill(1.0), Color::new(0.5, 0.7, 1.0), t)
 }
-
-
 
