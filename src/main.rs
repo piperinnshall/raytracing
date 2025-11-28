@@ -19,8 +19,6 @@ const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
 fn main() {
     assert!(IMAGE_HEIGHT > 1);
    
-    // World
-
     let mut world = HitList::new();
     world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
     world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
