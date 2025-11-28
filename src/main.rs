@@ -4,6 +4,7 @@ mod ray;
 mod render;
 mod vec3;
 mod shape;
+mod hit;
 
 use camera::Camera;
 

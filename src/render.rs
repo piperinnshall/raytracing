@@ -1,3 +1,4 @@
+use crate::hit::Hittable;
 use crate::vec3::{Point3, Vec3};
 use crate::camera::Camera;
 use crate::ray::Ray;
@@ -30,7 +31,7 @@ pub fn render_image(camera: Camera, image_width: i32, image_height: i32) {
             let ray_direction = pixel_center - camera.center();
             let ray = Ray::new(camera.center(), ray_direction);
 
-            let color = color(ray);
+            // let color = color(ray);
 
             color::write_color(&mut io::stdout(), color);
         }
@@ -39,20 +40,20 @@ pub fn render_image(camera: Camera, image_width: i32, image_height: i32) {
     eprintln!("Done!");
 }
 
-fn color(ray: Ray) -> Color {
-    let sphere = Sphere {
-        center: Vec3::new(0.0, 0.0, -1.0),
-        radius: 0.5,
-    };
-
-    let hit = shape::hit(&sphere, &ray);
-    if hit > 0.0 {
-        return shape::surface_color(&sphere, &ray, hit);
-    }
-
-    let unit_direction = ray.direction().normalize();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-
-    color::lerp(Color::fill(1.0), Color::new(0.5, 0.7, 1.0), t)
+fn color<T: Hittable>(ray: Ray, world: T) -> Color {
+    // let sphere = Sphere {
+    //     center: Vec3::new(0.0, 0.0, -1.0),
+    //     radius: 0.5,
+    // };
+    //
+    // let hit = shape::hit(&sphere, &ray);
+    // if hit > 0.0 {
+    //     return shape::surface_color(&sphere, &ray, hit);
+    // }
+    //
+    // let unit_direction = ray.direction().normalize();
+    // let t = 0.5 * (unit_direction.y() + 1.0);
+    //
+    color::lerp(Color::fill(1.0), Color::new(0.5, 0.7, 1.0), 0.0)
 }
 
