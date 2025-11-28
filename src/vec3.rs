@@ -1,14 +1,57 @@
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub};
 
+use crate::utils;
+
 #[derive(Clone, Copy)]
 pub struct Vec3 {
     e: [f64; 3],
 }
 
 impl Vec3 {
-    pub fn new(x: f64, y: f64, z: f64) -> Self { Self { e: [x, y, z] } }
-    pub fn fill(n: f64) -> Self { Self { e: [n, n, n]  } }
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { e: [x, y, z] }
+    }
+
+    pub fn fill(n: f64) -> Self {
+        Self::new(n, n, n)
+    }
+
+    pub fn random() -> Self {
+        Self::new(
+            utils::random_f64(),
+            utils::random_f64(),
+            utils::random_f64(),
+        )
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Self {
+        Self::new(
+            utils::random_range_f64(min, max),
+            utils::random_range_f64(min, max),
+            utils::random_range_f64(min, max),
+        )
+    }
+
+    pub fn random_normalized() -> Self {
+        loop {
+            let p = Self::random_range(-1.0, 1.0);
+            let lensq = p.length_squared();
+            if 1e-160 < lensq && lensq <= 1.0 {
+                break p / lensq.sqrt()
+            }
+        }
+    }
+
+    pub fn random_on_hemisphere(normal: Self) -> Self {
+        let on_unit_sphere = Self::random_normalized();
+        // In the same hemisphere as normal
+        if on_unit_sphere.dot(normal) > 0.0 {
+            on_unit_sphere
+        } else { 
+            -on_unit_sphere
+        }
+    }
 
     pub fn dot(self, rhs: Self) -> f64 {
         self[0] * rhs[0] + self[1] * rhs[1] + self[2] * rhs[2]
@@ -22,16 +65,19 @@ impl Vec3 {
         )
     }
 
-    pub fn normalize(self) -> Self { self / self.length() }
+    pub fn normalized(self) -> Self { self / self.length() }
+
+    pub fn length(&self) -> f64 {
+        self.length_squared().sqrt()
+    }
+
+    pub fn length_squared(&self) -> f64 {
+        self[0] * self[0] + self[1] * self[1] + self[2] * self[2]
+    }
 
     pub fn x(&self) -> f64 { self[0] }
     pub fn y(&self) -> f64 { self[1] }
     pub fn z(&self) -> f64 { self[2] }
-
-    pub fn length(&self) -> f64 { self.length_squared().sqrt() }
-    pub fn length_squared(&self) -> f64 {
-        self[0] * self[0] + self[1] * self[1] + self[2] * self[2]
-    }
 }
 
 pub type Point3 = Vec3;
@@ -74,7 +120,11 @@ impl_op!(Sub, sub, -);
 impl_op!(Add, add, +);
 impl_op!(Mul, mul, *);
 // Vec3 op $scalar
-impl_op!(Mul, mul, f64, |s: Self, r| Self::new(s[0] * r, s[1] * r, s[2] * r));
+impl_op!(Mul, mul, f64, |s: Self, r| Self::new(
+    s[0] * r,
+    s[1] * r,
+    s[2] * r
+));
 impl_op!(Div, div, f64, |s: Self, r| s * (1.0 / r));
 
 impl AddAssign for Vec3 {

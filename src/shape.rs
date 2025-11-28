@@ -26,7 +26,7 @@ impl Hittable for Sphere {
             return false
         }
 
-        let sqrtd = f64::sqrt(discriminant);
+        let sqrtd = discriminant.sqrt();
 
         // Find the nearest root that lies in the acceptable range.
         let mut root = (h - sqrtd) / a;

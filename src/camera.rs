@@ -74,7 +74,7 @@ impl Camera {
             for row in 0..self.image_width {
                 let mut pixel_color = Color::default();
 
-                for sample in 0..self.samples_per_pixel {
+                for _ in 0..self.samples_per_pixel {
                     let ray = self.ray(row, col);
                     pixel_color += Self::color(ray, &world);
                 }
@@ -111,11 +111,13 @@ impl Camera {
 
     fn color(ray: Ray, world: &HitList) -> Color {
         let mut rec = HitRecord::default();
+
         if world.hit(&ray, Interval::new(0.0, f64::INFINITY), &mut rec) {
-            return (Color::fill(1.0) + rec.normal) * 0.5;
+            let direction = Vec3::random_on_hemisphere(rec.normal);
+            return Self::color(Ray::new(rec.point, direction), &world) * 0.5
         }
 
-        let unit_direction = ray.direction().normalize();
+        let unit_direction = ray.direction().normalized();
         let t = 0.5 * (unit_direction.y() + 1.0);
 
         color::lerp(Color::fill(1.0), Color::new(0.5, 0.7, 1.0), t)
