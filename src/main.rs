@@ -14,7 +14,7 @@ use vec3::Point3;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const VIEWPORT_HEIGHT: f64 = 2.0;
-const IMAGE_HEIGHT: i32 = 225;
+const IMAGE_HEIGHT: i32 = 1080;
 
 fn main() {
     assert!(IMAGE_HEIGHT > 1);
