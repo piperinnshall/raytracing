@@ -19,6 +19,7 @@ pub struct Camera {
     pixel_delta_v: Vec3,
     center: Point3, // Camera center
     pixel_00_loc: Point3, // Location of pixel 0, 0
+    max_depth: i32, // Maximum number of ray bounces into a scene
     samples_per_pixel: i32, // Count of random samples  for each pixel
     pixel_samples_scale: f64 // Color scale factor for a small sum of pixel samples
 }
@@ -42,6 +43,7 @@ impl Camera {
         let pixel_00_loc: Point3 = Self::upper_left(center, viewport_u, viewport_v, focal_length)
             + (pixel_delta_u + pixel_delta_v) * 0.5;
 
+        let max_depth = 10;
         let samples_per_pixel = 100;
         let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
 
@@ -58,6 +60,7 @@ impl Camera {
             pixel_delta_v,
             center,
             pixel_00_loc,
+            max_depth,
             samples_per_pixel,
             pixel_samples_scale,
         }
@@ -76,7 +79,7 @@ impl Camera {
 
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.ray(row, col);
-                    pixel_color += Self::color(ray, &world);
+                    pixel_color += Self::color(self.max_depth, ray, &world);
                 }
 
                 color::write_color(&mut io::stdout(), pixel_color * self.pixel_samples_scale );
@@ -109,12 +112,17 @@ impl Camera {
         center - Vec3::new(0.0, 0.0, focal_length) - u / 2.0 - v / 2.0
     }
 
-    fn color(ray: Ray, world: &HitList) -> Color {
+    fn color(depth: i32, ray: Ray, world: &HitList) -> Color {
+        // If we've exceeded the ray bounce limit, no more light is gathered.
+        if depth <= 0 {
+            return Color::default()
+        }
+
         let mut rec = HitRecord::default();
 
         if world.hit(&ray, Interval::new(0.0, f64::INFINITY), &mut rec) {
             let direction = Vec3::random_on_hemisphere(rec.normal);
-            return Self::color(Ray::new(rec.point, direction), &world) * 0.5
+            return Self::color(depth - 1, Ray::new(rec.point, direction), &world) * 0.5
         }
 
         let unit_direction = ray.direction().normalized();
