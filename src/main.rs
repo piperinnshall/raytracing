@@ -22,6 +22,7 @@ fn main() {
     let mut world = HitList::new();
     world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
     world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
+    world.add(Sphere::new(Point3::new(-1.0, -0.5, -1.0), 0.4));
 
     let camera = Camera::new(2.0, IMAGE_WIDTH, IMAGE_HEIGHT);
     camera.render(&world);
