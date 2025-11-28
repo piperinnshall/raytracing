@@ -2,11 +2,11 @@ use crate::vec3::{Point3, Vec3};
 use crate::camera::Camera;
 use crate::ray::Ray;
 use crate::color::{self, Color};
-use crate::shape::Sphere;
+use crate::shape::{self, Sphere};
 
 use std::io;
 
-pub fn render_image(camera: Camera, image_height: i32, image_width: i32) {
+pub fn render_image(camera: Camera, image_width: i32, image_height: i32) {
     let pixel_delta_u = camera.delta_u(image_width as f64);
     let pixel_delta_v = camera.delta_v(image_height as f64);
 
@@ -44,6 +44,8 @@ fn color(ray: Ray) -> Color {
         center: Vec3::new(0.0, 0.0, -1.0),
         radius: 0.5,
     };
+
+    if shape::hit(&sphere, &ray) { return Color::new(1.0, 0.0, 0.0); }
 
     let unit_direction = ray.direction().normalize();
     let t = 0.5 * (unit_direction.y() + 1.0);

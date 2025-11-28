@@ -6,7 +6,7 @@ pub struct Sphere {
     pub radius: f64,
 }
 
-pub fn hit(sphere: &Sphere, ray: Ray) -> bool {
+pub fn hit(sphere: &Sphere, ray: &Ray) -> bool {
     let oc = sphere.center - ray.origin();
     let a = Vec3::dot(ray.direction(), ray.direction());
     let b = Vec3::dot(ray.direction(), oc) * -2.0;
