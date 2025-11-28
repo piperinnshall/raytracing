@@ -12,8 +12,12 @@ pub fn write_color(out: &mut impl Write, pixel_color: Color) {
     let g = pixel_color.y();
     let b = pixel_color.z();
 
-    // Translate the [0,1] component values to the byte range [0,255].
+    // Apply a linear transform for gamma 2
+    let r = linear_to_gamma(r);
+    let g = linear_to_gamma(g);
+    let b = linear_to_gamma(b);
 
+    // Translate the [0,1] component values to the byte range [0,255].
     let intensity: Interval = Interval::new(0.000, 0.999);
     let rbyte = (intensity.clamp(r) * 256.0) as u8;
     let gbyte = (intensity.clamp(g) * 256.0) as u8;
@@ -24,4 +28,8 @@ pub fn write_color(out: &mut impl Write, pixel_color: Color) {
 
 pub fn lerp(c1: Color, c2: Color, t: f64) -> Color {
     c1 * (1.0 - t) + c2 * t
+}
+
+fn linear_to_gamma(linear_component: f64) -> f64{
+    linear_component.max(0.0).sqrt()
 }
