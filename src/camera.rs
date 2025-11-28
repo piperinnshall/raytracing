@@ -43,7 +43,7 @@ impl Camera {
         let pixel_00_loc: Point3 = Self::upper_left(center, viewport_u, viewport_v, focal_length)
             + (pixel_delta_u + pixel_delta_v) * 0.5;
 
-        let max_depth = 10;
+        let max_depth = 50;
         let samples_per_pixel = 100;
         let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
 
@@ -120,7 +120,7 @@ impl Camera {
 
         let mut rec = HitRecord::default();
 
-        if world.hit(&ray, Interval::new(0.0, f64::INFINITY), &mut rec) {
+        if world.hit(&ray, Interval::new(0.001, f64::INFINITY), &mut rec) {
             let direction = Vec3::random_on_hemisphere(rec.normal);
             return Self::color(depth - 1, Ray::new(rec.point, direction), &world) * 0.5
         }

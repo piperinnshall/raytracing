@@ -14,7 +14,7 @@ use vec3::Point3;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const VIEWPORT_HEIGHT: f64 = 2.0;
-const IMAGE_HEIGHT: i32 = 225;
+const IMAGE_HEIGHT: i32 = 2160;
 
 fn main() {
     assert!(IMAGE_HEIGHT > 1);
@@ -22,7 +22,6 @@ fn main() {
     let mut world = HitList::new();
     world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
     world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
-    world.add(Sphere::new(Point3::new(-1.0, -0.5, -1.0), 0.4));
 
     let camera = Camera::new(ASPECT_RATIO, VIEWPORT_HEIGHT, IMAGE_HEIGHT);
     camera.render(&world);

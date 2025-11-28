@@ -38,7 +38,7 @@ impl Vec3 {
             let p = Self::random_range(-1.0, 1.0);
             let lensq = p.length_squared();
             if 1e-160 < lensq && lensq <= 1.0 {
-                break p / lensq.sqrt()
+                break p / lensq.sqrt();
             }
         }
     }
@@ -48,7 +48,7 @@ impl Vec3 {
         // In the same hemisphere as normal
         if on_unit_sphere.dot(normal) > 0.0 {
             on_unit_sphere
-        } else { 
+        } else {
             -on_unit_sphere
         }
     }
@@ -65,7 +65,9 @@ impl Vec3 {
         )
     }
 
-    pub fn normalized(self) -> Self { self / self.length() }
+    pub fn normalized(self) -> Self {
+        self / self.length()
+    }
 
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
@@ -75,9 +77,15 @@ impl Vec3 {
         self[0] * self[0] + self[1] * self[1] + self[2] * self[2]
     }
 
-    pub fn x(&self) -> f64 { self[0] }
-    pub fn y(&self) -> f64 { self[1] }
-    pub fn z(&self) -> f64 { self[2] }
+    pub fn x(&self) -> f64 {
+        self[0]
+    }
+    pub fn y(&self) -> f64 {
+        self[1]
+    }
+    pub fn z(&self) -> f64 {
+        self[2]
+    }
 }
 
 pub type Point3 = Vec3;
@@ -119,6 +127,7 @@ macro_rules! impl_op {
 impl_op!(Sub, sub, -);
 impl_op!(Add, add, +);
 impl_op!(Mul, mul, *);
+
 // Vec3 op $scalar
 impl_op!(Mul, mul, f64, |s: Self, r| Self::new(
     s[0] * r,
@@ -135,6 +144,7 @@ impl AddAssign for Vec3 {
         self[2] += rhs[2];
     }
 }
+
 impl MulAssign<f64> for Vec3 {
     // Vec3 *= f64
     fn mul_assign(&mut self, rhs: f64) {
@@ -143,6 +153,7 @@ impl MulAssign<f64> for Vec3 {
         self[2] *= rhs;
     }
 }
+
 impl DivAssign<f64> for Vec3 {
     // Vec3 /= f64
     fn div_assign(&mut self, rhs: f64) {
@@ -158,6 +169,7 @@ impl Neg for Vec3 {
         Self::new(-self[0], -self[1], -self[2])
     }
 }
+
 impl Index<usize> for Vec3 {
     // Vec3[i]
     type Output = f64;
@@ -166,6 +178,7 @@ impl Index<usize> for Vec3 {
         &self.e[index]
     }
 }
+
 impl IndexMut<usize> for Vec3 {
     // Vec3[i] = 0
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
