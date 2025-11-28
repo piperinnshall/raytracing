@@ -1,4 +1,4 @@
-use crate::vec3::Vec3;
+use crate::{interval::Interval, vec3::Vec3};
 use std::io::Write;
 
 pub type Color = Vec3;
@@ -14,9 +14,10 @@ pub fn write_color(out: &mut impl Write, pixel_color: Color) {
 
     // Translate the [0,1] component values to the byte range [0,255].
 
-    let rbyte = (r * 255.999) as u8;
-    let gbyte = (g * 255.999) as u8;
-    let bbyte = (b * 255.999) as u8;
+    let intensity: Interval = Interval::new(0.000, 0.999);
+    let rbyte = (intensity.clamp(r) * 256.0) as u8;
+    let gbyte = (intensity.clamp(g) * 256.0) as u8;
+    let bbyte = (intensity.clamp(b) * 256.0) as u8;
 
     writeln!(out, "{} {} {}", rbyte, gbyte, bbyte).expect("writing color");
 }
