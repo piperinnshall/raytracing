@@ -27,24 +27,12 @@ impl Camera {
         } 
     }
     
-    pub fn render_image(&self) {
-
-        // World
-
-        let mut world = HitList::new();
-        world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
-        world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
-        world.add(Sphere::new(Point3::new(-1.0, 0.5, -1.0), 0.3));
-
-        // Camera 
-
+    pub fn render(&self, world: &HitList) {
         let pixel_delta_u = self.delta_u(self.image_width as f64);
         let pixel_delta_v = self.delta_v(self.image_height as f64);
 
         let pixel00_loc: Point3 = 
             self.upper_left() + (pixel_delta_u + pixel_delta_v) * 0.5;
-
-        // Render
 
         eprintln!("--- Begin Rendering ---");
 
@@ -88,16 +76,16 @@ impl Camera {
     fn upper_left(&self) -> Point3 {
         self.center 
             - Vec3::new(0.0, 0.0, self.focal_length) 
-            - self.u() / 2.0
-            - self.v() / 2.0
+            - self.viewport_u() / 2.0
+            - self.viewport_v() / 2.0
     }
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges.
-    fn u(&self) -> Vec3 { Vec3::new(self.viewport_width, 0.0, 0.0) }
-    fn v(&self) -> Vec3 { Vec3::new(0.0, -self.viewport_height, 0.0) }
+    fn viewport_u(&self) -> Vec3 { Vec3::new(self.viewport_width, 0.0, 0.0) }
+    fn viewport_v(&self) -> Vec3 { Vec3::new(0.0, -self.viewport_height, 0.0) }
 
     // Calculate the horizontal and vertical delta vectors from pixel to pixel.
-    fn delta_u(&self, direction: f64) -> Vec3 { self.u() / direction }
-    fn delta_v(&self, direction: f64) -> Vec3 { self.v() / direction }
+    fn delta_u(&self, direction: f64) -> Vec3 { self.viewport_u() / direction }
+    fn delta_v(&self, direction: f64) -> Vec3 { self.viewport_v() / direction }
 
 }
