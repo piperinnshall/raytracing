@@ -19,18 +19,18 @@ use color::Color;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const VIEWPORT_HEIGHT: f64 = 2.0;
-const IMAGE_HEIGHT: i32 = 225;
+const IMAGE_HEIGHT: i32 = 2160;
 
 fn main() {
     assert!(IMAGE_HEIGHT > 1);
 
     let mut world = HitList::new();
 
-    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
-    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
-
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.1, 0.6, 0.1))); // grass green
+    let material_center = Rc::new(Lambertian::new(Color::new(0.5, 0.1, 0.6))); // purple
+    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8))); // silver metal
+    let material_right = Rc::new(Metal::new(Color::new(0.0, 0.3, 0.0))); // dark green
+                                                                              //
     world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, material_ground.clone()));
     world.add(Sphere::new(Point3::new(0.0, 0.0, -1.2), 0.5, material_center.clone()));
     world.add(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, material_left.clone()));
