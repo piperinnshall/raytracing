@@ -38,7 +38,7 @@ impl Vec3 {
             let p = Self::random_range(-1.0, 1.0);
             let lensq = p.length_squared();
             if 1e-160 < lensq && lensq <= 1.0 {
-                break p / lensq.sqrt();
+                break p / lensq.sqrt()
             }
         }
     }
@@ -75,6 +75,12 @@ impl Vec3 {
 
     pub fn length_squared(&self) -> f64 {
         self[0] * self[0] + self[1] * self[1] + self[2] * self[2]
+    }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        (self[0].abs() < s) && (self[1].abs() < s) && (self[2].abs() < s)
+
     }
 
     pub fn x(&self) -> f64 {

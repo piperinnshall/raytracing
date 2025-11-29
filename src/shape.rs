@@ -31,7 +31,7 @@ impl Hittable for Sphere {
 
         let discriminant = h * h - a * c;
         if discriminant < 0.0 {
-            return false;
+            return false
         }
 
         let sqrtd = discriminant.sqrt();
@@ -41,7 +41,7 @@ impl Hittable for Sphere {
         if !ray_t.surrounds(root) {
             root = (h + sqrtd) / a;
             if !ray_t.surrounds(root) {
-                return false;
+                return false
             }
         }
 
