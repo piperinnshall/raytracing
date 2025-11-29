@@ -1,16 +1,24 @@
+use std::rc::Rc;
+
+use crate::hit::{HitRecord, Hittable};
 use crate::interval::Interval;
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
-use crate::hit::{HitRecord, Hittable};
 
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    pub mat: Rc<dyn Material>,
 }
 
 impl Sphere {
     pub fn new(center: Point3, radius: f64) -> Self {
-        Self { center, radius: radius.max(0.0) }
+        Self {
+            center,
+            radius: radius.max(0.0),
+            mat: todo!(),
+        }
     }
 }
 
@@ -23,7 +31,7 @@ impl Hittable for Sphere {
 
         let discriminant = h * h - a * c;
         if discriminant < 0.0 {
-            return false
+            return false;
         }
 
         let sqrtd = discriminant.sqrt();
@@ -33,7 +41,7 @@ impl Hittable for Sphere {
         if !ray_t.surrounds(root) {
             root = (h + sqrtd) / a;
             if !ray_t.surrounds(root) {
-                return false
+                return false;
             }
         }
 
@@ -41,6 +49,7 @@ impl Hittable for Sphere {
         rec.point = ray.at(rec.t);
         let outward_normal = (rec.point - self.center) / self.radius;
         rec.set_face_normal(ray, outward_normal);
+        rec.mat = Some(self.mat.clone());
 
         true
     }

@@ -1,11 +1,12 @@
 mod camera;
 mod color;
-mod ray;
-mod vec3;
-mod shape;
 mod hit;
-mod utils;
 mod interval;
+mod material;
+mod ray;
+mod shape;
+mod utils;
+mod vec3;
 
 use camera::Camera;
 use hit::HitList;
@@ -18,7 +19,7 @@ const IMAGE_HEIGHT: i32 = 225;
 
 fn main() {
     assert!(IMAGE_HEIGHT > 1);
-   
+
     let mut world = HitList::new();
     world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
     world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
