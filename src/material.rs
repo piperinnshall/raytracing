@@ -7,11 +7,11 @@ pub trait Material {
     fn scatter(&self, r_in: Ray, rec: HitRecord) -> Option<(Color, Ray)>;
 }
 
-struct Lambertian {
+pub struct Lambertian {
     albedo: Color,
 }
 
-struct Metal {
+pub struct Metal {
     albedo: Color,
 }
 
