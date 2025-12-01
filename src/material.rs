@@ -16,6 +16,10 @@ pub struct Metal {
     fuzz: f64,
 }
 
+pub struct Dielectric { 
+    refraction_index: f64,
+}
+
 impl Lambertian {
     pub fn new(albedo: Color) -> Self {
         Self { albedo }
@@ -26,6 +30,12 @@ impl Metal {
     pub fn new(albedo: Color, fuzz: f64) -> Self {
         let fuzz = if fuzz < 1.0 { fuzz } else { 1.0 };
         Self { albedo, fuzz }
+    }
+}
+
+impl Dielectric {
+    pub fn new(refraction_index: f64) -> Self {
+        Self { refraction_index }
     }
 }
 
@@ -54,5 +64,20 @@ impl Material for Metal {
         } else {
             None
         }
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, r_in: Ray, rec: HitRecord) -> Option<(Color, Ray)> {
+        let ri  = if rec.front_facing { 
+            1.0 / self.refraction_index 
+        } else { 
+            self.refraction_index 
+        };
+
+        let unit_direction = r_in.direction().normalized();
+        let refracted = unit_direction.refract(rec.normal, ri);
+
+        Some((Color::fill(1.0), Ray::new(rec.point, refracted)))
     }
 }

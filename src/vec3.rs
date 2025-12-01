@@ -57,6 +57,13 @@ impl Vec3 {
         self - rhs * 2.0 * self.dot(rhs)
     }
 
+    pub fn refract(self, rhs: Self, etai_over_etat: f64) -> Self {
+        let cos_theta = (-self).dot(rhs).min(1.0);
+        let r_out_perpendicular = (self + rhs * cos_theta) *  etai_over_etat;
+        let r_out_parrallel = -rhs * (1.0 - r_out_perpendicular.length_squared()).abs().sqrt();
+        r_out_parrallel + r_out_perpendicular
+    }
+
     pub fn dot(self, rhs: Self) -> f64 {
         self[0] * rhs[0] + self[1] * rhs[1] + self[2] * rhs[2]
     }
