@@ -40,8 +40,8 @@ fn main() {
     let aspect_ratio = 16.0 / 9.0;
 
     // let image_height = 100;
-    let image_height = 225;
-    // let image_height = 2160;
+    // let image_height = 225;
+    let image_height = 2160;
 
     let samples_per_pixel = 100;
     let max_depth = 50;
@@ -51,8 +51,7 @@ fn main() {
     let look_at = Point3::new(0.0, 0.0, -1.0);
     let up = vec3::Vec3::new(0.0, 1.0, 0.0);
 
-
-    let defocus_angle = 4.0;
+    let defocus_angle = 10.0;
     let shiny_center = Point3::new(-1.0, 0.0, -1.0);
     let focus_dist = (look_from - shiny_center).length();
 
