@@ -1,3 +1,5 @@
+#![feature(default_field_values)] 
+
 mod camera;
 mod color;
 mod hit;

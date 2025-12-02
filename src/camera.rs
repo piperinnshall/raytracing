@@ -6,73 +6,62 @@ use crate::utils;
 use crate::vec3::{Point3, Vec3};
 use std::io;
 
+#[derive(Default)]
 pub struct Camera {
-    focal_length: f64,
-    vertical_fov: f64,
-    aspect_ratio: f64, // Ratio of image width over height
-    image_width: i32, // Rendered image width in pixel count
-    image_height: i32, // Rendered image height in pixel count
-    viewport_width: f64, // Viewport width in pixel count
-    viewport_height: f64, // Viewport height in pixel count
-    viewport_u: Vec3,
-    viewport_v: Vec3,
-    pixel_delta_u: Vec3,
-    pixel_delta_v: Vec3,
+    focal_length: f64 = 1.0,
+    vertical_fov: f64 = 120.0,
+    aspect_ratio: f64 = 16.0 / 9.0, // Ratio of image width over height
+    image_width: i32 = 400, // Rendered image width in pixel count
+    image_height: i32 = 225, // Rendered image height in pixel count
+    viewport_width: f64 = 0.0, // Viewport width in pixel count
+    viewport_height: f64 = 0.0, // Viewport height in pixel count
+    viewport_u: Vec3, // Initialized in new()
+    viewport_v: Vec3, // Initialized in new()
+    pixel_delta_u: Vec3, // Initialized in new()
+    pixel_delta_v: Vec3, // Initialized in new()
     center: Point3, // Camera center
-    pixel_00_loc: Point3, // Location of pixel 0, 0
-    max_depth: i32, // Maximum number of ray bounces into a scene
-    samples_per_pixel: i32, // Count of random samples  for each pixel
-    pixel_samples_scale: f64, // Color scale factor for a small sum of pixel samples
+    pixel_00_loc: Point3, // Location of pixel 0, 0, initialized in new()
+    max_depth: i32 = 50, // Maximum number of ray bounces into a scene
+    samples_per_pixel: i32 = 100, // Count of random samples for each pixel
+    pixel_samples_scale: f64 = 1.0 / 100.0, // Color scale factor for a small sum of pixel samples
 }
 
 impl Camera {
     pub fn new(aspect_ratio: f64, image_height: i32) -> Self {
-        let image_width = (image_height as f64 * aspect_ratio) as i32;
-        let image_width = if image_width < 1 { 1 } else { image_width };
-
-        let focal_length = 1.0;
-        let vertical_fov = 120.0;
-        let max_depth = 50;
-        let samples_per_pixel = 100;
-        let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
+        let mut cam = Camera {
+            aspect_ratio,
+            image_height,
+            image_width: (image_height as f64 * aspect_ratio).max(1.0) as i32,
+            viewport_u: Vec3::new(0.0, 0.0, 0.0),
+            viewport_v: Vec3::new(0.0, 0.0, 0.0),
+            pixel_delta_u: Vec3::new(0.0, 0.0, 0.0),
+            pixel_delta_v: Vec3::new(0.0, 0.0, 0.0),
+            pixel_00_loc: Point3::default(),
+            center: Point3::default(),
+            ..Self::default()
+        };
 
         // Determine viewport dimensions.
-        let theta = utils::deg_to_rad(vertical_fov);
+        let theta = utils::deg_to_rad(cam.vertical_fov);
         let h = (theta / 2.0).tan();
-        let viewport_height = 2.0 * h * focal_length;
-        let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
+        cam.viewport_height = 2.0 * h * cam.focal_length;
+        cam.viewport_width =
+            cam.viewport_height * (cam.image_width as f64 / cam.image_height as f64);
 
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+        cam.viewport_u = Vec3::new(cam.viewport_width, 0.0, 0.0);
+        cam.viewport_v = Vec3::new(0.0, -cam.viewport_height, 0.0);
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
-        let pixel_delta_u = viewport_u / image_width as f64;
-        let pixel_delta_v = viewport_v / image_height as f64;
+        cam.pixel_delta_u = cam.viewport_u / cam.image_width as f64;
+        cam.pixel_delta_v = cam.viewport_v / cam.image_height as f64;
 
         // Calculate the location of the upper left pixel.
-        let center = Vec3::default();
-        let pixel_00_loc: Point3 = Self::upper_left(center, viewport_u, viewport_v, focal_length)
-            + (pixel_delta_u + pixel_delta_v) * 0.5;
+        cam.pixel_00_loc =
+            Self::upper_left(cam.center, cam.viewport_u, cam.viewport_v, cam.focal_length)
+                + (cam.pixel_delta_u + cam.pixel_delta_v) * 0.5;
 
-        Self {
-            vertical_fov,
-            aspect_ratio,
-            focal_length,
-            image_width,
-            image_height,
-            viewport_width,
-            viewport_height,
-            viewport_u,
-            viewport_v,
-            pixel_delta_u,
-            pixel_delta_v,
-            center,
-            pixel_00_loc,
-            max_depth,
-            samples_per_pixel,
-            pixel_samples_scale,
-        }
+        cam
     }
 
     pub fn render(&self, world: &HitList) {
@@ -91,7 +80,7 @@ impl Camera {
                     pixel_color += Self::color(self.max_depth, ray, &world);
                 }
 
-                color::write_color(&mut io::stdout(), pixel_color * self.pixel_samples_scale );
+                color::write_color(&mut io::stdout(), pixel_color * self.pixel_samples_scale);
             }
         }
 
@@ -124,7 +113,7 @@ impl Camera {
     fn color(depth: i32, ray: Ray, world: &HitList) -> Color {
         // If we've exceeded the ray bounce limit, no more light is gathered.
         if depth <= 0 {
-            return Color::default()
+            return Color::default();
         }
 
         let mut rec = HitRecord::default();
@@ -145,4 +134,3 @@ impl Camera {
         color::lerp(Color::fill(1.0), Color::new(0.5, 0.7, 1.0), t)
     }
 }
-
