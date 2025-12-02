@@ -7,8 +7,9 @@ use crate::vec3::{Point3, Vec3};
 use std::io;
 
 pub struct Camera {
-    aspect_ratio: f64, // Ratio of image width over height
     focal_length: f64,
+    vertical_fov: f64,
+    aspect_ratio: f64, // Ratio of image width over height
     image_width: i32, // Rendered image width in pixel count
     image_height: i32, // Rendered image height in pixel count
     viewport_width: f64, // Viewport width in pixel count
@@ -21,14 +22,24 @@ pub struct Camera {
     pixel_00_loc: Point3, // Location of pixel 0, 0
     max_depth: i32, // Maximum number of ray bounces into a scene
     samples_per_pixel: i32, // Count of random samples  for each pixel
-    pixel_samples_scale: f64 // Color scale factor for a small sum of pixel samples
+    pixel_samples_scale: f64, // Color scale factor for a small sum of pixel samples
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64, viewport_height: f64, image_height: i32) -> Self {
-        let focal_length = 1.0;
-
+    pub fn new(aspect_ratio: f64, image_height: i32) -> Self {
         let image_width = (image_height as f64 * aspect_ratio) as i32;
+        let image_width = if image_width < 1 { 1 } else { image_width };
+
+        let focal_length = 1.0;
+        let vertical_fov = 120.0;
+        let max_depth = 50;
+        let samples_per_pixel = 100;
+        let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
+
+        // Determine viewport dimensions.
+        let theta = utils::deg_to_rad(vertical_fov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
@@ -39,15 +50,13 @@ impl Camera {
         let pixel_delta_u = viewport_u / image_width as f64;
         let pixel_delta_v = viewport_v / image_height as f64;
 
+        // Calculate the location of the upper left pixel.
         let center = Vec3::default();
         let pixel_00_loc: Point3 = Self::upper_left(center, viewport_u, viewport_v, focal_length)
             + (pixel_delta_u + pixel_delta_v) * 0.5;
 
-        let max_depth = 50;
-        let samples_per_pixel = 100;
-        let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
-
         Self {
+            vertical_fov,
             aspect_ratio,
             focal_length,
             image_width,

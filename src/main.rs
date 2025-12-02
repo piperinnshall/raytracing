@@ -18,9 +18,8 @@ use material::{Lambertian, Metal, Dielectric};
 use color::Color;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const VIEWPORT_HEIGHT: f64 = 2.0;
-// const IMAGE_HEIGHT: i32 = 225;
-const IMAGE_HEIGHT: i32 = 2160;
+const IMAGE_HEIGHT: i32 = 225;
+// const IMAGE_HEIGHT: i32 = 2160;
 
 fn main() {
     assert!(IMAGE_HEIGHT > 1);
@@ -40,7 +39,7 @@ fn main() {
     world.add(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, material_left.clone()));
     world.add(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.4, material_bubble.clone()));
 
-    let camera = Camera::new(ASPECT_RATIO, VIEWPORT_HEIGHT, IMAGE_HEIGHT);
+    let camera = Camera::new(ASPECT_RATIO, IMAGE_HEIGHT);
     camera.render(&world);
 }
 
