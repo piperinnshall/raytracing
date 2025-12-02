@@ -2,6 +2,7 @@ use crate::color::Color;
 use crate::hit::HitRecord;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
+use crate::utils;
 
 pub trait Material {
     fn scatter(&self, r_in: Ray, rec: HitRecord) -> Option<(Color, Ray)>;
@@ -16,7 +17,9 @@ pub struct Metal {
     fuzz: f64,
 }
 
-pub struct Dielectric { 
+pub struct Dielectric {
+    // Refractive index in vacuum or air, or the ratio of the
+    // material's refractive index over the refractive index of the enclosing media
     refraction_index: f64,
 }
 
@@ -37,6 +40,12 @@ impl Dielectric {
     pub fn new(refraction_index: f64) -> Self {
         Self { refraction_index }
     }
+    fn reflectance(cosine: f64, refraction_index: f64) -> f64 {
+        // Use Schlick's approximation for reflectance.
+        let r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
+        let r0 = r0 * r0;
+        r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+    }
 }
 
 impl Material for Lambertian {
@@ -49,6 +58,7 @@ impl Material for Lambertian {
                 dir
             }
         };
+
         Some((self.albedo, Ray::new(rec.point, scatter_direction)))
     }
 }
@@ -69,15 +79,26 @@ impl Material for Metal {
 
 impl Material for Dielectric {
     fn scatter(&self, r_in: Ray, rec: HitRecord) -> Option<(Color, Ray)> {
-        let ri  = if rec.front_facing { 
-            1.0 / self.refraction_index 
-        } else { 
-            self.refraction_index 
+        let ri = if rec.front_facing {
+            1.0 / self.refraction_index
+        } else {
+            self.refraction_index
         };
 
         let unit_direction = r_in.direction().normalized();
-        let refracted = unit_direction.refract(rec.normal, ri);
 
-        Some((Color::fill(1.0), Ray::new(rec.point, refracted)))
+        let cos_theta = (-unit_direction).dot(rec.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+        let cannot_refract = ri * sin_theta > 1.0;
+        let reflectance = Self::reflectance(cos_theta, ri);
+
+        let direction = if cannot_refract || reflectance > utils::random_f64(){
+            unit_direction.reflect(rec.normal)
+        } else {
+            unit_direction.refract(rec.normal, ri)
+        };
+
+        Some((Color::fill(1.0), Ray::new(rec.point, direction)))
     }
 }
