@@ -8,8 +8,7 @@ use std::io;
 
 #[derive(Default)]
 pub struct Camera {
-    vertical_fov: f64 = 90.0,
-
+    vertical_fov: f64,
     look_from: Point3, // Point camera is looking from
     look_at: Point3, // Point camera is looking at
     up: Vec3, // Camera-relative "up" direction
@@ -42,6 +41,7 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(
+        vertical_fov: f64,
         aspect_ratio: f64,
         image_height: i32,
         look_from: Point3,
@@ -49,6 +49,7 @@ impl Camera {
         up: Vec3,
     ) -> Self {
         let mut cam = Camera {
+            vertical_fov,
             aspect_ratio,
             image_height,
             image_width: (image_height as f64 * aspect_ratio).max(1.0) as i32,
