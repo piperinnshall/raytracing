@@ -43,6 +43,20 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_unit_disk() -> Self { 
+        loop {
+            let p = Self::new( 
+                utils::random_range_f64(-1.0, 1.0), 
+                utils::random_range_f64(-1.0, 1.0), 
+                0.0
+            );
+
+            if p.length_squared() < 1.0 {
+                break p
+            }
+        }
+    }
+
     pub fn random_on_hemisphere(normal: Self) -> Self {
         let on_unit_sphere = Self::random_normalized();
         // In the same hemisphere as normal
@@ -52,6 +66,7 @@ impl Vec3 {
             -on_unit_sphere
         }
     }
+
 
     pub fn reflect(self, rhs: Self) -> Self {
         self - rhs * 2.0 * self.dot(rhs)
