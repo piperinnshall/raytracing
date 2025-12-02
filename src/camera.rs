@@ -8,36 +8,56 @@ use std::io;
 
 #[derive(Default)]
 pub struct Camera {
-    focal_length: f64 = 1.0,
-    vertical_fov: f64 = 120.0,
+    vertical_fov: f64 = 90.0,
+
+    look_from: Point3, // Point camera is looking from
+    look_at: Point3, // Point camera is looking at
+    up: Vec3, // Camera-relative "up" direction
+    
+    // Camera frame basis vectors
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
+
     aspect_ratio: f64 = 16.0 / 9.0, // Ratio of image width over height
-    image_width: i32 = 400, // Rendered image width in pixel count
-    image_height: i32 = 225, // Rendered image height in pixel count
-    viewport_width: f64 = 0.0, // Viewport width in pixel count
-    viewport_height: f64 = 0.0, // Viewport height in pixel count
-    viewport_u: Vec3, // Initialized in new()
-    viewport_v: Vec3, // Initialized in new()
-    pixel_delta_u: Vec3, // Initialized in new()
-    pixel_delta_v: Vec3, // Initialized in new()
-    center: Point3, // Camera center
-    pixel_00_loc: Point3, // Location of pixel 0, 0, initialized in new()
     max_depth: i32 = 50, // Maximum number of ray bounces into a scene
     samples_per_pixel: i32 = 100, // Count of random samples for each pixel
-    pixel_samples_scale: f64 = 1.0 / 100.0, // Color scale factor for a small sum of pixel samples
+    pixel_samples_scale: f64 = 1.0 / 100.0,  // Color scale factor for a small sum of pixel samples
+
+                                             
+    image_width: i32, // Rendered image width in pixel count
+    image_height: i32, // Rendered image height in pixel count
+    viewport_width: f64, // Viewport width in pixel count
+    viewport_height: f64, // Viewport height in pixel count
+
+    viewport_u: Vec3, // Vector down viewport vertical edge
+    viewport_v: Vec3, // Vector across viewport horizontal edge
+    pixel_delta_u: Vec3, // Offset to pixel to the right
+    pixel_delta_v: Vec3, // Offset to pixel below
+
+    center: Point3, // Camera center
+    focal_length: f64,
+    pixel_00_loc: Point3, // Location of pixel 0, 0
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64, image_height: i32) -> Self {
+    pub fn new(
+        aspect_ratio: f64,
+        image_height: i32,
+        look_from: Point3,
+        look_at: Point3,
+        up: Vec3,
+    ) -> Self {
         let mut cam = Camera {
             aspect_ratio,
             image_height,
             image_width: (image_height as f64 * aspect_ratio).max(1.0) as i32,
-            viewport_u: Vec3::new(0.0, 0.0, 0.0),
-            viewport_v: Vec3::new(0.0, 0.0, 0.0),
-            pixel_delta_u: Vec3::new(0.0, 0.0, 0.0),
-            pixel_delta_v: Vec3::new(0.0, 0.0, 0.0),
-            pixel_00_loc: Point3::default(),
-            center: Point3::default(),
+            look_from,
+            look_at,
+            up,
+            w: (look_from - look_at).normalized(),
+            center: look_from,
+            focal_length: (look_from - look_at).length(),
             ..Self::default()
         };
 
@@ -48,18 +68,23 @@ impl Camera {
         cam.viewport_width =
             cam.viewport_height * (cam.image_width as f64 / cam.image_height as f64);
 
+        // Calculate the u,v unit basis vectors for the camera coordinate frame.
+        cam.u = cam.up.cross(cam.w).normalized();
+        cam.v = cam.w.cross(cam.u);
+
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        cam.viewport_u = Vec3::new(cam.viewport_width, 0.0, 0.0);
-        cam.viewport_v = Vec3::new(0.0, -cam.viewport_height, 0.0);
+        cam.viewport_u = cam.u * cam.viewport_width;
+        cam.viewport_v = -cam.v * cam.viewport_height;
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
         cam.pixel_delta_u = cam.viewport_u / cam.image_width as f64;
         cam.pixel_delta_v = cam.viewport_v / cam.image_height as f64;
 
         // Calculate the location of the upper left pixel.
-        cam.pixel_00_loc =
-            Self::upper_left(cam.center, cam.viewport_u, cam.viewport_v, cam.focal_length)
-                + (cam.pixel_delta_u + cam.pixel_delta_v) * 0.5;
+        let viewport_upper_left =
+            cam.center - (cam.w * cam.focal_length) - cam.viewport_u/2.0 - cam.viewport_v/2.0;
+        cam.pixel_00_loc = 
+            viewport_upper_left + (cam.pixel_delta_u + cam.pixel_delta_v) * 0.5;
 
         cam
     }
@@ -91,7 +116,7 @@ impl Camera {
         // Construct a camera ray originating from the origin
         // and directed at randomly sampled point around the pixel location i, j.
 
-        let offset = self.sample_square();
+        let offset = Self::sample_square();
         let pixel_sample = self.pixel_00_loc
             + (self.pixel_delta_u * (offset.x() + row as f64))
             + (self.pixel_delta_v * (offset.y() + col as f64));
@@ -101,13 +126,9 @@ impl Camera {
         Ray::new(self.center, ray_direction)
     }
 
-    fn sample_square(&self) -> Vec3 {
+    fn sample_square() -> Vec3 {
         // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
         Vec3::new(utils::random_f64() - 0.5, utils::random_f64() - 0.5, 0.0)
-    }
-
-    fn upper_left(center: Point3, u: Vec3, v: Vec3, focal_length: f64) -> Point3 {
-        center - Vec3::new(0.0, 0.0, focal_length) - u / 2.0 - v / 2.0
     }
 
     fn color(depth: i32, ray: Ray, world: &HitList) -> Color {
@@ -120,10 +141,11 @@ impl Camera {
 
         if world.hit(&ray, Interval::new(0.001, f64::INFINITY), &mut rec) {
             if let Some(mat) = rec.mat.clone() {
-                if let Some((attenuation, scattered)) = mat.scatter(ray, rec) {
-                    return attenuation * Self::color(depth - 1, scattered, &world);
-                } else {
-                    return Color::default();
+                match mat.scatter(ray, rec) {
+                    Some((attenuation, scattered)) => {
+                        return attenuation * Self::color(depth - 1, scattered, &world)
+                    }
+                    None => return Color::default(),
                 }
             }
         }
