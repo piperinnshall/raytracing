@@ -8,6 +8,5 @@ A ray tracer based off of the [Ray Tracing in One Weekend](https://raytracing.gi
 ![11.2 Snell's Law](progress/glass-material.png)
 ![11.5 Modeling a Hollow Glass Sphere](progress/hollow-glass-material.png)
 ![13 Defocus Blur](progress/defocus-blur.png)
-
-
+![14.1 A Final Render](progress/final-scene.png)
 
